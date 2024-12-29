@@ -1,0 +1,145 @@
+A variável DWORD aDStack_17c[27]; é um array de 27 elementos do tipo DWORD, usado como uma estrutura temporária ou área de armazenamento durante a execução da função. Ela é alocada na pilha (stack) e é usada para guardar valores do tipo DWORD, que são inteiros de 32 bits sem sinal.
+
+Propósito em Contexto
+No código fornecido, aDStack_17c é utilizado em múltiplos momentos, mas seu principal uso parece ser como uma estrutura para armazenar configurações ou argumentos relacionados ao uso do DirectDraw e possivelmente outros componentes gráficos. Abaixo está uma análise mais detalhada.
+
+Usos no Código:
+Configuração de Superfície do DirectDraw:
+
+c
+Copiar código
+aDStack_17c[1] = 0x6c;   // Tamanho da estrutura (provavelmente um cabeçalho ou contexto)
+aDStack_17c[2] = 1;      // Provavelmente um tipo ou flag de inicialização
+uStack_110 = 0x200;      // Outro valor associado a essa configuração
+iVar7 = (**(code **)(*DAT_004a6030 + 0x18))
+                   (DAT_004a6030, aDStack_17c + 1, &DAT_004a5a78, 0);
+Aqui, partes do array aDStack_17c estão sendo configuradas com valores específicos antes de serem passadas como argumentos para uma função do DirectDraw. Parece que os valores armazenados definem propriedades ou comportamentos relacionados a superfícies gráficas.
+
+Configuração Adicional:
+
+c
+Copiar código
+aDStack_17c[2] = 7;      // Outra configuração ou flag
+uStack_110 = 0x800;      // Valor associado a essa configuração
+aDStack_17c[4] = 0x280;  // Largura da superfície (640 pixels)
+aDStack_17c[3] = 0x1e0;  // Altura da superfície (480 pixels)
+iVar7 = (**(code **)(*DAT_004a6030 + 0x18))
+                   (DAT_004a6030, aDStack_17c + 1, &DAT_004a6010, 0);
+Aqui, o array é usado novamente para armazenar informações como dimensões da superfície (640x480 pixels) e talvez outros atributos relacionados.
+
+Tamanho Total do Array: O tamanho do array (27 elementos) indica que ele foi alocado para ter espaço suficiente para diferentes usos dentro da função. Apenas algumas posições são utilizadas explicitamente no código fornecido, enquanto outras podem estar reservadas para futuras configurações ou chamadas de função.
+
+Motivo para Usar um Array:
+Organização de Dados: Um array facilita o armazenamento de valores relacionados de forma contígua, o que é eficiente para passar como argumentos para funções que esperam ponteiros ou estruturas.
+Facilidade de Modificação: Usando índices, é fácil alterar valores específicos ou reutilizar o array em diferentes contextos.
+Memória na Pilha: Como o array está na pilha, ele é temporário e será automaticamente desalocado ao final da execução da função, o que economiza memória e simplifica o gerenciamento.
+Conclusão:
+A variável aDStack_17c serve como um buffer ou estrutura de dados temporária, principalmente para armazenar parâmetros relacionados às chamadas de função do DirectDraw. Seu conteúdo é configurado conforme necessário para descrever superfícies gráficas, tamanhos, flags e outros atributos necessários ao funcionamento da aplicação.
+
+
+
+
+
+
+Você disse:
+no ghidra como eu altero? quero alterar os valores dalargura e altura
+O ChatGPT disse:
+ChatGPT
+Para alterar os valores de largura e altura no Ghidra, você pode seguir os passos abaixo. O objetivo é modificar os valores específicos que são atribuídos às variáveis, como aDStack_17c[4] (largura) e aDStack_17c[3] (altura), que no seu código são 0x280 (640 em decimal) e 0x1E0 (480 em decimal), respectivamente.
+
+Passo 1: Identificar o Endereço das Instruções
+Localize o Array no Código: No Ghidra, navegue até a função MAIN_GAMEWINDOW e encontre os trechos onde os valores de largura e altura são atribuídos:
+
+c
+Copiar código
+aDStack_17c[4] = 0x280;  // Largura (640 em decimal)
+aDStack_17c[3] = 0x1e0;  // Altura (480 em decimal)
+Veja a Instrução no Assembly:
+
+Ghidra mostrará essas atribuições em formato de assembly, algo como:
+asm
+Copiar código
+MOV DWORD PTR [EBP-XX], 0x280  ; largura
+MOV DWORD PTR [EBP-YY], 0x1E0  ; altura
+Onde EBP-XX e EBP-YY são os deslocamentos do array aDStack_17c na pilha.
+Confirme os Deslocamentos: Certifique-se de que XX e YY correspondem às posições corretas dentro do array (aDStack_17c[4] e aDStack_17c[3]).
+
+Passo 2: Mude os Valores
+Entre no Modo de Edição:
+
+Clique com o botão direito na instrução MOV que atribui o valor que você quer mudar.
+Escolha a opção Patch Instruction.
+Edite o Valor:
+
+Modifique o valor imediato (por exemplo, de 0x280 para 0x320 para largura de 800, ou 0x1E0 para 0x258 para altura de 600).
+Salve a alteração.
+Alternativa: Hex Editor: Se preferir, você pode usar o Hex Editor:
+
+Navegue até o endereço de memória da instrução no segmento de código.
+Localize o valor em hexadecimal (por exemplo, 80 02 para 0x280 ou E0 01 para 0x1E0).
+Substitua pelos valores desejados (ex.: 20 03 para 800 ou 58 02 para 600).
+Passo 3: Teste as Alterações
+Exporte o binário modificado no Ghidra.
+Execute o programa modificado para verificar se as dimensões (largura e altura) mudaram conforme esperado.
+Observação Importante:
+Backup do Executável: Antes de realizar alterações, faça um backup do executável original.
+Precaução: Alterar valores pode gerar comportamentos inesperados se houver dependências rígidas desses valores em outras partes do código.
+Rever Dependências: Certifique-se de que o programa não calcula outros valores baseados na largura e altura originais (como tamanho de buffers, escalas, etc.), pois isso pode causar crashes.
+Se precisar de mais detalhes sobre como realizar essas alterações, posso ajudar!
+
+
+
+
+
+
+Você disse:
+MOV DWORD PTR \[EBP-XX\], 0x280 ; largura
+
+a largura esta assim:
+        00474000 89 7c 24 50     MOV        dword ptr [ESP + 0x50],EDI
+
+eu n posso mudar esse EDI paras, por exemplo, 0x500(resolucao q qeuro ne?
+O ChatGPT disse:
+ChatGPT
+Você está no caminho certo, mas não pode simplesmente substituir EDI diretamente por um valor imediato como 0x500 nesse caso, porque EDI é um registrador, e a instrução MOV DWORD PTR [ESP + 0x50], EDI indica que o valor da largura já foi carregado no registrador EDI anteriormente. Você precisará rastrear onde o valor de EDI está sendo definido e alterá-lo diretamente.
+
+Passo 1: Localizar a Origem do Valor de EDI
+Encontre o Carregamento de EDI: Antes da instrução MOV DWORD PTR [ESP + 0x50], EDI, procure onde EDI está sendo definido. Por exemplo:
+
+asm
+Copiar código
+MOV EDI, 0x280
+Ou talvez algo como:
+
+asm
+Copiar código
+MOV EDI, [EBP-XX] ; valor sendo carregado de uma variável
+Mude o Valor de Origem: Se EDI for definido como MOV EDI, 0x280, você pode editar diretamente o valor 0x280 (640 em decimal) para o que você deseja, como 0x500 (1280 em decimal).
+
+Passo 2: Alterar Diretamente no Código
+No Ghidra:
+Clique na instrução onde EDI recebe o valor.
+Clique com o botão direito e selecione Patch Instruction.
+Modifique o valor imediato para o novo valor desejado (por exemplo, 0x500).
+Passo 3: Caso EDI Venha de Outro Local
+Se o valor de EDI está vindo de uma memória (como [EBP-XX] ou outra variável), você precisará alterar a instrução ou a variável em sua origem.
+
+Por exemplo:
+
+asm
+Copiar código
+MOV EDI, [EBP-XX] ; Aqui o valor está sendo carregado de um endereço
+Nesse caso, procure onde [EBP-XX] foi definido e altere esse valor.
+
+Passo 4: Considerar o Endereço Final
+Se você simplesmente mudar a instrução para:
+
+asm
+Copiar código
+MOV DWORD PTR [ESP + 0x50], 0x500
+Isso pode funcionar também, desde que o programa não dependa do valor de EDI mais tarde para outras operações. Nesse caso, substitua diretamente EDI pelo valor desejado no MOV.
+
+Resumo:
+Alterar EDI: Encontre onde EDI é definido e mude o valor de origem.
+Alterar o MOV Diretamente: Modifique a instrução para usar um valor imediato, mas tenha certeza de que EDI não será usado depois.
+Se precisar de ajuda com o trecho específico no Ghidra, posso te guiar passo a passo!
