@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title Ajuda da ferramenta de diagnóstico DX
+1 Ferramenta de diagnóstico DirectX
+2 Ferramenta de diagnóstico DirectX=_dx_DirectX_Diagnostic_Tool_dxdiag
+2 Sobre a ferramenta de diagnóstico DirectX=_dx_About_the_DirectX_Diagnostic_Tool_dxdiag
+2 O que procurar=_dx_What_to_Look_For_dxdiag
+2 Testando os componentes DirectX=_dx_Testing_DirectX_Components_dxdiag
+2 Alterando o comportamento padrão=_dx_Overriding_Default_Behavior_dxdiag
+2 Restaurando drivers=_dx_Restoring_Drivers_dxdiag
+2 Salvando informações=_dx_Saving_Information_dxdiag
+2 Relatando problemas=_dx_Reporting_Problems_dxdiag

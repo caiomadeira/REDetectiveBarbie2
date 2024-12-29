@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title Guida dell'utilità di diagnostica DirectX
+1 Utilità di diagnostica DirectX
+2 Utilità di diagnostica DirectX=_dx_DirectX_Diagnostic_Tool_dxdiag
+2 Informazioni sull'utilità di diagnostica=_dx_About_the_DirectX_Diagnostic_Tool_dxdiag
+2 Cosa cercare=_dx_What_to_Look_For_dxdiag
+2 Prova dei componenti DirectX=_dx_Testing_DirectX_Components_dxdiag
+2 Ignorare le impostazioni predefinite=_dx_Overriding_Default_Behavior_dxdiag
+2 Ripristino dei driver=_dx_Restoring_Drivers_dxdiag
+2 Salvataggio delle informazioni=_dx_Saving_Information_dxdiag
+2 Segnalazione dei problemi=_dx_Reporting_Problems_dxdiag

@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title DirectX 诊断工具帮助
+1 DirectX 诊断工具
+2 DirectX 诊断工具=_dx_DirectX_Diagnostic_Tool_dxdiag
+2 关于 DirectX 诊断工具=_dx_About_the_DirectX_Diagnostic_Tool_dxdiag
+2 注意事项=_dx_What_to_Look_For_dxdiag
+2 测试 DirectX 组件=_dx_Testing_DirectX_Components_dxdiag
+2 取代默认行为=_dx_Overriding_Default_Behavior_dxdiag
+2 还原驱动程序=_dx_Restoring_Drivers_dxdiag
+2 保存信息=_dx_Saving_Information_dxdiag
+2 报告问题=_dx_Reporting_Problems_dxdiag

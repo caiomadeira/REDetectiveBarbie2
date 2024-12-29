@@ -1,0 +1,10 @@
+:Base dxdiag.hlp
+:Title Aide de l'outil de diagnostic DirectX
+1 Outil de diagnostic DirectX
+1 Outil de diagnostic DirectX=_dx_DirectX_Diagnostic_Tool_dxdiag
+1 À propos de l'outil de diagnostic DirectX=_dx_About_The_DirectX_Diagnostic_Tool_dxdiag
+1 Éléments à rechercher=_dx_What_to_Look_For_dxdiag
+1 Test des composants DirectX=_dx_Testing_DirectX_Components_dxdiag
+1 Remplacement du comportement par défaut=_dx_Overriding_Default_Behavior_dxdiag
+1 Enregistrement des informations=_dx_Saving_Information_dxdiag
+1 Signalement des problèmes=_dx_Reporting_Problems_dxdiag

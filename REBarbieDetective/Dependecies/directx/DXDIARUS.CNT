@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title Средство диагностики DX
+1 Средство диагностики DirectX Diagnostic Tool
+2 DirectX Diagnostic Tool=_dx_DirectX_Diagnostic_Tool_dxdiag
+2 Средство диагностики DirectX Diagnostic Tool=_dx_About_the_DirectX_Diagnostic_Tool_dxdiag
+2 Поиск информации=_dx_What_to_Look_For_dxdiag
+2 Тестирование компонентов DirectX=_dx_Testing_DirectX_Components_dxdiag
+2 Переопределение характеристик по умолчанию=_dx_Overriding_Default_Behavior_dxdiag
+2 Восстановление драйверов=_dx_Restoring_Drivers_dxdiag
+2 Сохранение информации=_dx_Saving_Information_dxdiag
+2 Отчет о неполадках=_dx_Reporting_Problems_dxdiag

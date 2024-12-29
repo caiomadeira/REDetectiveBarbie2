@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title DirectX 診断ツールのヘルプ
+1 DirectX 診断ツール
+2 DirectX 診断ツール =_dx_DirectX_Diagnostic_Tool_dxdiag
+2 DirectX 診断ツールについて =_dx_About_the_DirectX_Diagnostic_Tool_dxdiag
+2 問題の原因を特定する =_dx_What_to_Look_For_dxdiag
+2 DirectX コンポーネントのテストを行う =_dx_Testing_DirectX_Components_dxdiag
+2 既定の動作を変更する =_dx_Overriding_Default_Behavior_dxdiag
+2 ドライバを復元する =_dx_Restoring_Drivers_dxdiag
+2 情報を保存する =_dx_Saving_Information_dxdiag
+2 問題を報告する =_dx_Reporting_Problems_dxdiag

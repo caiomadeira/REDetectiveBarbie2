@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title Narzêdzie diagnostyczne DirectX - Pomoc
+1 Narzêdzie diagnostyczne DirectX
+2 Narzêdzie diagnostyczne DirectX=_dx_DirectX_Diagnostic_Tool_dxdiag
+2 Informacje o narzêdziu diagnostycznym DirectX=_dx_About_the_DirectX_Diagnostic_Tool_dxdiag
+2 Czego szukaæ=_dx_What_to_Look_For_dxdiag
+2 Testowanie sk³adników DirectX=_dx_Testing_DirectX_Components_dxdiag
+2 Zastêpowanie domyœlnego sposobu dzia³ania=_dx_Overriding_Default_Behavior_dxdiag
+2 Przywracanie sterowników=_dx_Restoring_Drivers_dxdiag
+2 Zapisywanie informacji=_dx_Saving_Information_dxdiag
+2 Raportowanie problemów=_dx_Reporting_Problems_dxdiag

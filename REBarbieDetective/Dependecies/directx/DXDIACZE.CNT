@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title Nápovìda pro diagnostický nástroj DX
+1 Diagnostický nástroj DirectX
+1 Diagnostický nástroj DirectX=_dx_DirectX_Diagnostic_Tool_dxdiag@dxdiag.hlp
+1 O diagnostickém nástroji DirectX=_dx_About_The_DirectX_Diagnostic_Tool_dxdiag@dxdiag.hlp
+1 Co je tøeba zkontrolovat=_dx_What_to_Look_For_dxdiag@dxdiag.hlp
+1 Testování komponent DirectX=_dx_Testing_DirectX_Components_dxdiag@dxdiag.hlp
+1 Pøepis výchozího chování=_dx_Overriding_Default_Behavior_dxdiag@dxdiag.hlp
+1 Obnovení ovladaèù=_dx_Restoring_Drivers_dxdiag@dxdiag.hlp
+1 Uložení informací=_dx_Saving_Information_dxdiag@dxdiag.hlp
+1 Ohlášení problémù=_dx_Reporting_Problems_dxdiag@dxdiag.hlp

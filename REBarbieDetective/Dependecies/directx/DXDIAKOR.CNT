@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title DX Diagnostic Tool Help
+1 DirectX 진단 도구
+2 DirectX 진단 도구=_dx_DirectX_Diagnostic_Tool_dxdiag
+2 DirectX 진단 도구 정보=_dx_About_the_DirectX_Diagnostic_Tool_dxdiag
+2 확인 사항=_dx_What_to_Look_For_dxdiag
+2 DirectX 구성 요소 테스트=_dx_Testing_DirectX_Components_dxdiag
+2 기본 동작 무시=_dx_Overriding_Default_Behavior_dxdiag
+2 드라이버 복원=_dx_Restoring_Drivers_dxdiag
+2 정보 저장=_dx_Saving_Information_dxdiag
+2 오류 리포트=_dx_Reporting_Problems_dxdiag

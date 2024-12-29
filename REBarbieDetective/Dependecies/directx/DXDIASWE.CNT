@@ -1,0 +1,11 @@
+:Base dxdiag.hlp>main
+:Title Hjälp om Diagnostikverktyg för DirectX
+1 Diagnostikverktyg för DirectX
+2 Diagnostikverktyg för DirectX=_dx_DirectX_Diagnostic_Tool_dxdiag
+2 Om Diagnostikverktyg för DirectX=_dx_About_the_DirectX_Diagnostic_Tool_dxdiag
+2 Vad du bör titta efter=_dx_What_to_Look_For_dxdiag
+2 Testa DirectX-komponenter=_dx_Testing_DirectX_Components_dxdiag
+2 Ändra standardinställningarna=_dx_Overriding_Default_Behavior_dxdiag
+2 Återställa drivrutinerna=_dx_Restoring_Drivers_dxdiag
+2 Spara information=_dx_Saving_Information_dxdiag
+2 Rapportera problem=_dx_Reporting_Problems_dxdiag
