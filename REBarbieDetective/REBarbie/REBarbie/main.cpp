@@ -3,11 +3,27 @@
 #include <mmsystem.h> // timeGetTime()(WInMM.dll)
 #include <ddraw.h> // DirectDrawCreate()(DDRAW.dll)
 #include <dsound.h> // IDirectSound
+#include <new>
+#include <iostream>
 
 #pragma comment(lib, "WinMM.lib") // A diretiva informa ao compilador pra automaticamente linkar a lib
 #pragma comment(lib, "ddraw.lib")
 
 #define MAX_LOADSTRING 100
+
+// ::::::::::::::::::::::::::::::
+// DAT_XXXXXXX GLOBALS
+
+LPDIRECTDRAW DAT_004a6030 = NULL;
+LPDIRECTDRAWSURFACE primarySurface = NULL; //  &DAT_004a5a78 -> endereco do local onde o ponteiro pra superficie criada sera armazenado
+LPDIRECTDRAWSURFACE secondarySurface = NULL;
+
+// CreatePallete Parameters
+LPPALETTEENTRY DAT_004a5b98 = NULL; // Tabela de cores
+LPDIRECTDRAWPALETTE DAT_004a600c = NULL; // Ponteiro para a paleta
+
+
+// ::::::::::::::::::::::::::::::
 
 // Variáveis Globais:
 HINSTANCE hInst;                                // instância atual
@@ -87,10 +103,10 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
     IDirectDrawSurface* pIVar15;
 
     BYTE* pBVar16;
+    WNDCLASS wc = { 0 }; // WINDCLASSA wc
+
     //void* pvStack_c;
     int uStack_4; // undefined4 uStack_4;
-
-    WNDCLASS wc = { 0 }; // WINDCLASSA wc
 
     // ==============================================
     uStack_4 = -1; //uStack_4 = 0xffffffff;
@@ -158,167 +174,268 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
                 
             }
             ReleaseDC(hWnd, hDC);
+            // &DAT_004a6030 is probably the address of pointer of  LPDIRECTDRAW *lplpDD
             directResult = DirectDrawCreate(0, &DAT_004a6030, 0);
             if (directResult == 0)
             {
-                int graphicRenderWidth = 0x280; // 640
-                int graphicRenderHeight = 0x1e0; // 480
-                directResult = (**(code**)(*DAT_004a6030 + 0x54))
-                    (DAT_004a6030, graphicRenderWidth, graphicRenderHeight, (int)DAT_0049370c << 3); //directResult = (**(code**)(*DAT_004a6030 + 0x54)) (DAT_004a6030, 0x280, 0x1e0, (int)DAT_0049370c << 3);
+                //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                //::::::::::::::::::::::::::: V TABLE 1 ::::::::::::::::::::::::::::::::::::::::::::::
+                //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                // Linha: directResult = (**(code**)(*DAT_004a6030 + 0x50))(DAT_004a6030, hWnd, 0x13);
+                directResult = DAT_004a6030->SetCooperativeLevel(hWnd, DDSCL_FULLSCREEN | DDSCL_EXCLUSIVE);
+                //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                if (directResult == 0) {
+                    int graphicRenderWidth = 0x280; // 640
+                    int graphicRenderHeight = 0x1e0; // 480
+                    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                    //::::::::::::::::::::::::::: V TABLE 2 ::::::::::::::::::::::::::::::::::::::::::::::
+                    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                    // Linha: directResult = (**(code**)(*DAT_004a6030 + 0x54))(DAT_004a6030, graphicRenderWidth, graphicRenderHeight, (int)DAT_0049370c << 3); //directResult = (**(code**)(*DAT_004a6030 + 0x54)) (DAT_004a6030, 0x280, 0x1e0, (int)DAT_0049370c << 3);
+                    // Utiliza o offset passado (0x54) para procurar a funcao no vtable.
+                    
+                    typedef HRESULT(*SetDisplayModeFunc)(LPDIRECTDRAW, DWORD, DWORD, DWORD);
+                    SetDisplayModeFunc SetDisplayMode = *(SetDisplayModeFunc*)((uintptr_t)(*(void**)DAT_004a6030) + 0x54);
+                    if (SetDisplayMode == NULL) { printf("Erro: função SetDisplayMode não encontrada no vtable.\n"); return -1; }
+                    
+                    // Configurando o modo de exibição para 640x480 com 16 bits de cor
+                    directResult = SetDisplayMode(DAT_004a6030, 640, 480, 16);
+                    if (directResult != DD_OK) { printf("Erro ao configurar o modo de exibição: 0x%x\n", directResult); return -1; }
+                    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                if (directResult == 0)
-                {
-                    aDStack_17c[1] = 0x6c;
-                    aDStack_17c[2] = 1;
-                    uStack_110 = 0x200;
-                    directResult = (**(code**)(*DAT_004a6030 + 0x18))
-                        (DAT_004a6030, aDStack_17c + 1, &DAT_004a5a78, 0);
                     if (directResult == 0)
                     {
-                        aDStack_17c[2] = 7;
-                        uStack_110 = 0x800;
-                        aDStack_17c[4] = 0x280; // This is about Width resolution of render
-                        aDStack_17c[3] = 0x1e0; // This is about Height resolution of render
-                        directResult = (**(code**)(*DAT_004a6030 + 0x18))
-                            (DAT_004a6030, aDStack_17c + 1, &DAT_004a6010, 0);
-                    }
+                        aDStack_17c[1] = 0x6c;
+                        aDStack_17c[2] = 1;
+                        uStack_110 = 0x200;
+                       //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                       //::::::::::::::::::::::::::: V TABLE 3 ::::::::::::::::::::::::::::::::::::::::::::::
+                       //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                       // Linha: directResult = (**(code**)(*DAT_004a6030 + 0x18))(DAT_004a6030, aDStack_17c + 1,, 0);
+                       // Utiliza o offset passado (0x18) para procurar a funcao no vtable.
+                       // 
+                       // Definindo o tipo do método CreateSurface
+                        typedef HRESULT(*CreateSurfaceFunc)(
+                            LPDIRECTDRAW,
+                            LPDDSURFACEDESC,
+                            LPDIRECTDRAWSURFACE*,
+                            IUnknown*
+                            );
 
-                    if (directResult != 0) {
-                        FUN_00473ce0(hWnd);
-                    }
-                    _DAT_004a5b88 = 0;
-                    _DAT_004a5b90 = 0x280;
-                    _DAT_004a5b8c = 0;
-                    _DAT_004a5b94 = 0x1e0;
-                    _DAT_004a5fa0 = 0x6c;
-                    ShowCursor(0);
+                        // Obtemos o ponteiro para o método CreateSurface da vtable
+                        CreateSurfaceFunc CreateSurface = *(CreateSurfaceFunc*)((uintptr_t)(*(void**)DAT_004a6030) + 0x18);
 
-                    if (DAT_0049370c == 1) // (DAT_0049370c == '\x01') 
-                    {
-                        uVar5 = FUN_00442a30(
-                            "C:\\Users\\caiom\\OneDrive\\Área de Trabalho\\REDetectiveBarbie2\\REBarbieDetective\\DATA\\detect.pal",
-                            DAT_004a5b98); // uVar5 = FUN_00442a30(s_data\detect.pal_00493158,0x4a5b98);
-                        if ((char)uVar5 == '\0') // se o caractere for nulo
+                        if (CreateSurface != NULL) {
+                            DDSURFACEDESC surfaceDesc = { 0 };
+                            surfaceDesc.dwSize = sizeof(DDSURFACEDESC);
+                            surfaceDesc.dwFlags = DDSD_CAPS;
+                            surfaceDesc.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
+
+                            // Criando a superfície
+                            HRESULT directResult = CreateSurface(DAT_004a6030, &surfaceDesc, &primarySurface, NULL);
+                            if (directResult != DD_OK) {
+                                printf("Erro ao criar superfície: 0x%x\n", directResult);
+                            }
+                        }
+                        else {
+                            printf("Erro: método CreateSurface não encontrado na vtable.\n");
+                        }
+
+                       //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                       //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                        if (directResult == 0)
                         {
-                            // ExceptionList = pvStack_c;
-                            MessageBox(nullptr, L"uVar5 == NULL TERMINATOR", L"Error", MB_OK | MB_ICONERROR);
-                            return 0;
-                        }
+                            aDStack_17c[2] = 7;
+                            uStack_110 = 0x800;
+                            aDStack_17c[4] = 0x280; // This is about Width resolution of render
+                            aDStack_17c[3] = 0x1e0; // This is about Height resolution of render
+                            //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                            //::::::::::::::::::::::::::: V TABLE 4 (MESMA DO VTABLE 3) ::::::::::::::::::::::::::::::::::::::::::::::
+                            //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                            // Linha: directResult = (**(code**)(*DAT_004a6030 + 0x18))(DAT_004a6030, aDStack_17c + 1,, 0);
+                            // Utiliza o offset passado (0x18) para procurar a funcao no vtable.
+                            // 
+                            // Definindo o tipo do método CreateSurface
+                            typedef HRESULT(*CreateSurfaceFunc)(
+                                LPDIRECTDRAW,
+                                LPDDSURFACEDESC,
+                                LPDIRECTDRAWSURFACE*,
+                                IUnknown*
+                                );
 
-                        directResult = (**(code**)(*DAT_004a6030 + 0x14))
-                            (DAT_004a6030, 0x44, &DAT_004a5b98, &DAT_004a600c, 0);
+                            // Obtemos o ponteiro para o método CreateSurface da vtable
+                            CreateSurfaceFunc CreateSurface = *(CreateSurfaceFunc*)((uintptr_t)(*(void**)DAT_004a6030) + 0x18);
+
+                            if (CreateSurface != NULL) {
+                                DDSURFACEDESC surfaceDesc = { 0 };
+                                surfaceDesc.dwSize = sizeof(DDSURFACEDESC);
+                                surfaceDesc.dwFlags = DDSD_CAPS;
+                                surfaceDesc.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
+
+                                // Criando a superfície
+                                LPDIRECTDRAWSURFACE secondarySurface = NULL; 
+                                HRESULT directResult = CreateSurface(DAT_004a6030, &surfaceDesc, &secondarySurface, NULL);
+                                if (directResult != DD_OK) {
+                                    printf("Erro ao criar superfície: 0x%x\n", directResult);
+                                }
+                            }
+                            else {
+                                printf("Erro: método CreateSurface não encontrado na vtable.\n");
+                            }
+
+                            //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                            //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                        }
 
                         if (directResult != 0) {
                             FUN_00473ce0(hWnd);
                         }
+                        _DAT_004a5b88 = 0;
+                        _DAT_004a5b90 = 0x280;
+                        _DAT_004a5b8c = 0;
+                        _DAT_004a5b94 = 0x1e0;
+                        _DAT_004a5fa0 = 0x6c;
+                        ShowCursor(0);
 
-                        directResult = (**(code**)(*DAT_004a5a78 + 0x7c))(DAT_004a5a78, DAT_004a600c);
+                        if (DAT_0049370c == 1) // (DAT_0049370c == '\x01') 
+                        {
+                            uVar5 = FUN_00442a30(
+                                "C:\\Users\\caiom\\OneDrive\\Área de Trabalho\\REDetectiveBarbie2\\REBarbieDetective\\DATA\\detect.pal",
+                                DAT_004a5b98); // uVar5 = FUN_00442a30(s_data\detect.pal_00493158,0x4a5b98);
+                            if ((char)uVar5 == '\0') // se o caractere for nulo
+                            {
+                                // ExceptionList = pvStack_c;
+                                MessageBox(nullptr, L"uVar5 == NULL TERMINATOR", L"Error", MB_OK | MB_ICONERROR);
+                                return 0;
+                            }
 
-                        if (directResult != 0) {
-                            FUN_00473ce0(hWnd);
+                            // VTABLE 5
+                            // linha: directResult = (**(code**)(*DAT_004a6030 + 0x14))(DAT_004a6030, 0x44, &DAT_004a5b98, &DAT_004a600c, 0);
+                            //
+                            directResult = DAT_004a6030->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256, DAT_004a5b98, &DAT_004a600c, NULL);
+                            if (directResult != 0) {
+                                FUN_00473ce0(hWnd);
+                            }
+                            // VTABLE 6 - BltFast probably
+                            // linha: directResult = (**(code**)(*primarySurface + 0x7c))(primarySurface, DAT_004a600c);
+                            RECT srcRect = { 0, 0, 50, 50 };
+                            directResult = primarySurface->BltFast(100, 100, secondarySurface, &srcRect, DDBLTFAST_NOCOLORKEY);
+
+                            if (directResult != 0) {
+                                FUN_00473ce0(hWnd);
+                            }
+
+                            LPDIRECTDRAWSURFACE DAT_004a6010 = NULL; // Superfície alvo
+                            // VTABLE 7 - Same as vtable 6 - BlitFast
+                            // linha: directResult = (**(code**)(*DAT_004a6010 + 0x7c))(DAT_004a6010, DAT_004a600c);
+                            directResult = DAT_004a6010->BltFast(
+                                150, 150, // Posição no destino (DAT_004a6010)
+                                primarySurface, // Superfície de origem
+                                &srcRect, // Retângulo de origem
+                                DDBLTFAST_NOCOLORKEY // Sem transparência
+                            );
+
+                            if (directResult != 0) {
+                                FUN_00473ce0(hWnd);
+                            }
                         }
-
-                        directResult = (**(code**)(*DAT_004a6010 + 0x7c))(DAT_004a6010, DAT_004a600c);
-                        if (directResult != 0) {
-                            FUN_00473ce0(hWnd);
+                        else {
+                            FUN_00442f30();
                         }
-                    }
-                    else {
-                        FUN_00442f30();
-                    }
-                    pvVar6 = operator_new(0x1010); // Probably, operator_new = malloc
-                    uStack_4 = 0;
-                    if (pvVar6 == (void*)0x0) // Maybe, i should put pvVar6 == NULL or nullptr
-                    {
-                        DAT_004a5f98 = (undefined4*)0x0;
-                    }
-                    else {
-                        DAT_004a5f98 = FUN_00474c60(pvVar6, hWnd, 1);
-                    }
-                    uStack_4 = -1;// uStack_4 = 0xffffffff; 
-                    puVar7 = (undefined4*)operator_new(0x210);
-                    if (puVar7 == (undefined4*)0x0) {
-                        puVar7 = (undefined4*)0x0;
-                    }
-                    else {
-                        *puVar7 = &PTR_LAB_0048b4a8;
-                        puVar7[1] = 1; // maybe its a int array
-                        puVar7[0x82] = 0;
-                    }
-                    FUN_00474da0(DAT_004a5f98, (int)puVar7); // or not because here we convert puVar7 to int
-                    pvVar6 = operator_new(8);
-                    uStack_4 = 1;
-                    if (pvVar6 == NULL) // if (pvVar6 == (void*)0x0) 
-                    {
-                        DAT_004a5a70 = (undefined4*)0x0;
-                    }
-                    else {
-                        DAT_004a5a70 = FUN_0043bd80(
-                            pvVar6,
-                            "C:\\Users\\caiom\\OneDrive\\Área de Trabalho\\REDetectiveBarbie2\\REBarbieDetective\\DATA\\pinames.hix",
-                            "C:\\Users\\caiom\\OneDrive\\Área de Trabalho\\REDetectiveBarbie2\\REBarbieDetective\\DATA\\pinames.hug"
-                        ); // DAT_004a5a70 = FUN_0043bd80(pvVar6, s_data\pinames.hix_004937e0, s_data\pinames.hug_004937f4);
-                    }
-                    DAT_004a41c0 = 0;
-                    uStack_4 = -1; // uStack_4 = 0xffffffff;
-                    DAT_004a41c4 = 0;
-                    puVar7 = &DAT_004a47fc;
-                    _DAT_004a41c8 = 0;
-                    _DAT_004a41cc = 0;
-                    _DAT_004a41d0 = 0;
-                    do {
-                        *puVar7 = 0;
-                        puVar7 = puVar7 + 2;
-                    } while ((int)puVar7 < DAT_004a484c); // DAT_004a484c is in 0x4a484c address
-                    FUN_00431860();
-                    DVar3 = timeGetTime();
-                    FUN_0047e516(DVar3);
-                    ShowWindow(hWnd, nCmdShow); // ShowWindow(hWnd,param_3); maybe, param_3 = nCmdShow
-                    // UpdateWindow(hWnd); // Eu adicionei essa linha
-                    FUN_00417d90();
-                    FUN_00431200();
-                    DAT_004a6018 = CreateThread((LPSECURITY_ATTRIBUTES)0x0, 0,
-                        (LPTHREAD_START_ROUTINE)&lpStartAddress_0043dae0, // 0043dae0 is the address. Maybe DAT_000a164.
-                        (LPVOID)0x0, 0, aDStack_17c);
-                    BStack_10c = DAT_004a6038;
-                    puVar7 = &uStack_10b;
+                        pvVar6 = operator new(0x1010, std::nothrow);  // pvVar6 = operator_new(0x1010); // Probably, operator_new = malloc; UPDATE: No, operator new is like malloc but for C++ objects
+                        uStack_4 = 0;
+                        if (pvVar6 == (void*)0x0) // Maybe, i should put pvVar6 == NULL or nullptr
+                        {
+                            DAT_004a5f98 = nullptr; // DAT_004a5f98 = (undefined4*)0x0;
+                        }
+                        else {
+                            DAT_004a5f98 = FUN_00474c60(pvVar6, hWnd, 1);
+                        }
+                        uStack_4 = -1;// uStack_4 = 0xffffffff; 
+                        puVar7 = operator new(0x210, std::nothrow); // puVar7 = (undefined4*)operator_new(0x210);
+                        if (puVar7 == nullptr) // if (puVar7 == (undefined4*)0x0) 
+                        {
+                            puVar7 = nullptr; // puVar7 = (undefined4*)0x0;
+                        }
+                        else {
+                            *puVar7 = &PTR_LAB_0048b4a8;
+                            puVar7[1] = 1; // maybe its a int array
+                            puVar7[0x82] = 0;
+                        }
+                        FUN_00474da0(DAT_004a5f98, (int)puVar7); // or not because here we convert puVar7 to int
+                        pvVar6 = operator new(8, std::nothrow); // pvVar6 = operator_new(8);
+                        uStack_4 = 1;
+                        if (pvVar6 == nullptr) // if (pvVar6 == (void*)0x0) 
+                        {
+                            DAT_004a5a70 = nullptr; // DAT_004a5a70 = (undefined4*)0x0;
+                        }
+                        else {
+                            DAT_004a5a70 = FUN_0043bd80(
+                                pvVar6,
+                                "C:\\Users\\caiom\\OneDrive\\Área de Trabalho\\REDetectiveBarbie2\\REBarbieDetective\\DATA\\pinames.hix",
+                                "C:\\Users\\caiom\\OneDrive\\Área de Trabalho\\REDetectiveBarbie2\\REBarbieDetective\\DATA\\pinames.hug"
+                            ); // DAT_004a5a70 = FUN_0043bd80(pvVar6, s_data\pinames.hix_004937e0, s_data\pinames.hug_004937f4);
+                        }
+                        DAT_004a41c0 = 0;
+                        uStack_4 = -1; // uStack_4 = 0xffffffff;
+                        DAT_004a41c4 = 0;
+                        puVar7 = &DAT_004a47fc;
+                        _DAT_004a41c8 = 0;
+                        _DAT_004a41cc = 0;
+                        _DAT_004a41d0 = 0;
+                        do {
+                            *puVar7 = 0;
+                            puVar7 = puVar7 + 2;
+                        } while ((int)puVar7 < DAT_004a484c); // DAT_004a484c is in 0x4a484c address
+                        FUN_00431860();
+                        DVar3 = timeGetTime();
+                        FUN_0047e516(DVar3);
+                        ShowWindow(hWnd, nCmdShow); // ShowWindow(hWnd,param_3); maybe, param_3 = nCmdShow
+                        // UpdateWindow(hWnd); // Eu adicionei essa linha
+                        FUN_00417d90();
+                        FUN_00431200();
+                        DAT_004a6018 = CreateThread((LPSECURITY_ATTRIBUTES)0x0, 0,
+                            (LPTHREAD_START_ROUTINE)&lpStartAddress_0043dae0, // 0043dae0 is the address. Maybe DAT_000a164.
+                            (LPVOID)0x0, 0, aDStack_17c);
+                        BStack_10c = DAT_004a6038;
+                        puVar7 = &uStack_10b;
 
-                    for (directResult = 0x3f; directResult != 0; directResult = directResult + -1) {
-                        *puVar7 = 0;
-                        puVar7 = puVar7 + 1;
-                    }
-                    *(undefined2*)puVar7 = 0;
-                    *(undefined*)((int)puVar7 + 2) = 0;
-                    FUN_00473bf0(&BStack_10c);
-                    // :::::::::::::::::::::::::::::::::::::::::::
-                    // Gus.dll calls
-                    // TODO: Como tenho apenas as GUS.DLL e GUSD.DLL (sem os arquivos .lib)
-                    // vou tentar linkar dinamicamente ao final utilizando funcoes do windows pra carregar
-                    // a funcao de RGBA propriarmente. 
-                    // 
-                    // Caso não der certo, vou tentar arranjar algum jeito de gerar um .lib.
-                    // Como última opção, usarei outra função RGBA.
-                    // 
-                    // Há ainda a possibilidade remota de reconstruir essa DLL.
-                    // :::::::::::::::::::::::::::::::::::::::::::
-                    uVar8 = Gus::RGBA(0, 0, 0, 0xff);
-                    uVar9 = Gus::RGBA(0xff, 0xff, 0xff, 0xff);
-                    uVar10 = Gus::RGBA(0, 0, 0, 0xff);
-                    uVar11 = Gus::RGBA(0x78, 0xdc, 0x78, 0xff);
-                    pBVar16 = &BStack_10c;
-                    directResult = 0x10;
+                        for (directResult = 0x3f; directResult != 0; directResult = directResult + -1) {
+                            *puVar7 = 0;
+                            puVar7 = puVar7 + 1;
+                        }
+                        *(undefined2*)puVar7 = 0;
+                        *(undefined*)((int)puVar7 + 2) = 0;
+                        FUN_00473bf0(&BStack_10c);
+                        // :::::::::::::::::::::::::::::::::::::::::::
+                        // Gus.dll calls
+                        // TODO: Como tenho apenas as GUS.DLL e GUSD.DLL (sem os arquivos .lib)
+                        // vou tentar linkar dinamicamente ao final utilizando funcoes do windows pra carregar
+                        // a funcao de RGBA propriarmente. 
+                        // 
+                        // Caso não der certo, vou tentar arranjar algum jeito de gerar um .lib.
+                        // Como última opção, usarei outra função RGBA.
+                        // 
+                        // Há ainda a possibilidade remota de reconstruir essa DLL.
+                        // :::::::::::::::::::::::::::::::::::::::::::
+                        uVar8 = Gus::RGBA(0, 0, 0, 0xff);
+                        uVar9 = Gus::RGBA(0xff, 0xff, 0xff, 0xff);
+                        uVar10 = Gus::RGBA(0, 0, 0, 0xff);
+                        uVar11 = Gus::RGBA(0x78, 0xdc, 0x78, 0xff);
+                        pBVar16 = &BStack_10c;
+                        directResult = 0x10;
 
-                    pIVar13 = (IDirectDraw*)DAT_004a6030;
-                    pIVar14 = (IDirectDrawSurface*)DAT_004a5a78;
-                    pIVar15 = (IDirectDrawSurface*)DAT_004a6010;
-                    pIVar12 = (IDirectSound*)FUN_00474d00(DAT_004a5f98);
-                    // Another Gus function call
-                    Gus::initialize(hWnd, pIVar12, pIVar13, pIVar14, pIVar15, directResult,
-                        (char*)pBVar16, uVar11, uVar10, uVar9, uVar8);
-                    uVar2 = 1;
-                    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-                    // A lot of 'elses' stataments in original code. Caution here. Probably get some problems in future.
-                    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                        pIVar13 = (IDirectDraw*)DAT_004a6030;
+                        pIVar14 = (IDirectDrawSurface*)primarySurface;
+                        pIVar15 = (IDirectDrawSurface*)DAT_004a6010;
+                        pIVar12 = (IDirectSound*)FUN_00474d00(DAT_004a5f98);
+                        // Another Gus function call
+                        Gus::initialize(hWnd, pIVar12, pIVar13, pIVar14, pIVar15, directResult,
+                            (char*)pBVar16, uVar11, uVar10, uVar9, uVar8);
+                        uVar2 = 1;
+                        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                        // A lot of 'elses' stataments in original code. Caution here. Probably get some problems in future.
+                        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                 } else { uVar2 = FUN_00473ce0(hWnd); }
             } else { uVar2 = FUN_00473ce0(hWnd); }
  
