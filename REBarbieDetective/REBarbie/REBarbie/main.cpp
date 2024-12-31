@@ -22,6 +22,8 @@ LPDIRECTDRAWSURFACE secondarySurface = NULL;
 LPPALETTEENTRY DAT_004a5b98 = NULL; // Tabela de cores
 LPDIRECTDRAWPALETTE DAT_004a600c = NULL; // Ponteiro para a paleta
 
+// CreateThread
+LPTHREAD_START_ROUTINE  DAT_0000a164 = NULL;
 
 // ::::::::::::::::::::::::::::::
 
@@ -37,6 +39,19 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2);
+
+// FUN_00473ce0
+int __cdecl directDrawFailedInit(HWND windowIdentifier)
+
+{
+    CHAR s[256];
+
+    // FUN_0047e1e1
+    // FUN_0047e1e1(s, (byte*)"DirectDraw initialization failed!!\nLocation Code: %u");
+    MessageBoxA(windowIdentifier, s, "Detectibe Barbie 2 by Caio M", 0);
+    DestroyWindow(windowIdentifier);
+    return 0;
+}
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
@@ -104,16 +119,24 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
 
     BYTE* pBVar16;
     WNDCLASS wc = { 0 }; // WINDCLASSA wc
+    DWORD aDStack_17c[27];
+    undefined4 uStack_110;
+    BYTE BStack_10c;
+    undefined4 uStack_10b;
+    void* pvStack_c;
+    undefined* puStack_8;
+    undefined4 uStack_4;
+
 
     //void* pvStack_c;
     int uStack_4; // undefined4 uStack_4;
 
     // ==============================================
     uStack_4 = -1; //uStack_4 = 0xffffffff;
-    //puStack_8 = &LAB_0048a5ec;
+    puStack_8 = &LAB_0048a5ec;
     //pvStack_c = ExceptionList;
     //ExceptionList = &pvStack_c;
-    //DAT_004a5a7c = FUN_00473d30();
+    DAT_004a5a7c = FUN_00473d30();
     // ==============================================
 
     // Look for active instance of the window (if the window is already open)
@@ -288,7 +311,7 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
                         }
 
                         if (directResult != 0) {
-                            FUN_00473ce0(hWnd);
+                            directDrawFailedInit(hWnd);
                         }
                         _DAT_004a5b88 = 0;
                         _DAT_004a5b90 = 0x280;
@@ -314,7 +337,7 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
                             //
                             directResult = DAT_004a6030->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256, DAT_004a5b98, &DAT_004a600c, NULL);
                             if (directResult != 0) {
-                                FUN_00473ce0(hWnd);
+                                directDrawFailedInit(hWnd);
                             }
                             // VTABLE 6 - BltFast probably
                             // linha: directResult = (**(code**)(*primarySurface + 0x7c))(primarySurface, DAT_004a600c);
@@ -322,7 +345,7 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
                             directResult = primarySurface->BltFast(100, 100, secondarySurface, &srcRect, DDBLTFAST_NOCOLORKEY);
 
                             if (directResult != 0) {
-                                FUN_00473ce0(hWnd);
+                                directDrawFailedInit(hWnd);
                             }
 
                             LPDIRECTDRAWSURFACE DAT_004a6010 = NULL; // Superfície alvo
@@ -336,7 +359,7 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
                             );
 
                             if (directResult != 0) {
-                                FUN_00473ce0(hWnd);
+                                directDrawFailedInit(hWnd);
                             }
                         }
                         else {
@@ -394,8 +417,8 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
                         // UpdateWindow(hWnd); // Eu adicionei essa linha
                         FUN_00417d90();
                         FUN_00431200();
-                        DAT_004a6018 = CreateThread((LPSECURITY_ATTRIBUTES)0x0, 0,
-                            (LPTHREAD_START_ROUTINE)&lpStartAddress_0043dae0, // 0043dae0 is the address. Maybe DAT_000a164.
+                        DAT_004a6018 = CreateThread(NULL, 0,
+                            (LPTHREAD_START_ROUTINE)&DAT_0000a164, // 0043dae0 is the address. Maybe DAT_000a164.
                             (LPVOID)0x0, 0, aDStack_17c);
                         BStack_10c = DAT_004a6038;
                         puVar7 = &uStack_10b;
@@ -436,10 +459,10 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
                         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                         // A lot of 'elses' stataments in original code. Caution here. Probably get some problems in future.
                         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-                } else { uVar2 = FUN_00473ce0(hWnd); }
-            } else { uVar2 = FUN_00473ce0(hWnd); }
+                } else { uVar2 = directDrawFailedInit(hWnd); }
+            } else { uVar2 = directDrawFailedInit(hWnd); }
  
-      } else { uVar2 = FUN_00473ce0(hWnd); }
+      } else { uVar2 = directDrawFailedInit(hWnd); }
     } else {
         LAB_00473dda:
         uVar2 = FUN_00473ca0();
