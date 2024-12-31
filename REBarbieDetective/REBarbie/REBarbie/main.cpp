@@ -5,6 +5,8 @@
 #include <dsound.h> // IDirectSound
 #include <new>
 #include <iostream>
+#include <stdint.h>
+
 
 #pragma comment(lib, "WinMM.lib") // A diretiva informa ao compilador pra automaticamente linkar a lib
 #pragma comment(lib, "ddraw.lib")
@@ -27,6 +29,7 @@ LPTHREAD_START_ROUTINE  DAT_0000a164 = NULL;
 
 // ::::::::::::::::::::::::::::::
 
+
 // Variáveis Globais:
 HINSTANCE hInst;                                // instância atual
 WCHAR szTitle[MAX_LOADSTRING];                  // O texto da barra de título
@@ -40,7 +43,102 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2);
 
-// FUN_00473ce0
+/*
+* FUN_00442a30
+A função FUN_00442a30 parece estar relacionada ao
+carregamento e manipulação de paletas ou dados gráficos, 
+como o nome do arquivo de paleta mencionado (s_Method_LoadPalette). 
+Aqui está o que acontece, passo a passo:
+*/
+//unsigned int __cdecl FUN_00442a30(undefined4 param_1, int param_2)
+//
+//{
+//    FILE* pFVar1;
+//    unsigned int uVar2;
+//    undefined* puVar3;
+//    char* pcVar4;
+//    int iVar5;
+//    char local_50c[12];
+//    CHAR local_500[256];
+//    char local_400[1024];
+//
+//    pFVar1 = (FILE*)FUN_0047d5d3(param_1, &DAT_0048f954);
+//    if (pFVar1 == (FILE*)0x0) {
+//        FUN_0047e1e1(local_500, (byte*)s_Method_LoadPalette(> _ % s_ < )_Faile_004933c0);
+//        uVar2 = MessageBoxA((HWND)0x0, local_500, s_Fatal_ERROR_004933b4, 0x10);
+//        return uVar2 & 0xffffff00;
+//    }
+//    FUN_0047d3ff(local_50c, 1, 0xc, (int*)pFVar1);
+//    FUN_0047d3ff(local_400, 4, 0x100, (int*)pFVar1);
+//    FUN_0047d382(pFVar1);
+//    puVar3 = (undefined*)(param_2 + 1);
+//    iVar5 = 0x100;
+//    pcVar4 = local_400;
+//    do {
+//        puVar3[1] = puVar3[(int)(local_400 + (1 - param_2))];
+//        *puVar3 = puVar3[(int)(local_400 + -param_2)];
+//        puVar3[-1] = *pcVar4;
+//        puVar3[2] = 5;
+//        puVar3 = puVar3 + 4;
+//        iVar5 = iVar5 + -1;
+//        pcVar4 = pcVar4 + 4;
+//    } while (iVar5 != 0);
+//    puVar3 = (undefined*)(param_2 + 3);
+//    iVar5 = 10;
+//    do {
+//        puVar3[0x3d8] = 2;
+//        *puVar3 = 2;
+//        puVar3 = puVar3 + 4;
+//        iVar5 = iVar5 + -1;
+//    } while (iVar5 != 0);
+//    return CONCAT31((int3)((uint)puVar3 >> 8), 1);
+//}
+
+// VERSAO SIMPLIFICADA DA FUN_00442a30
+// TODO: Revisar
+
+unsigned int FUN_00442a30(const char* filename, int base_offset) {
+    FILE* file;
+    char header[12];
+    char buffer[1024];
+    uint8_t* data_pointer;
+    int i;
+
+    // 1. Abrir o arquivo
+    file = fopen(filename, "rb");
+    if (file == NULL) {
+        printf("Error: Could not open file %s\n", filename);
+        return 0xFFFFFF00; // Código de erro simplificado
+    }
+
+    // 2. Ler os dados do arquivo
+    fread(header, 1, sizeof(header), file);
+    fread(buffer, 1, sizeof(buffer), file);
+    fclose(file);
+
+    // 3. Configurar os dados processados
+    data_pointer = (uint8_t*)(base_offset + 1); // Ajuste inicial do ponteiro
+    for (i = 0; i < 256; i++) {
+        data_pointer[1] = buffer[i];  // Simulação do processamento
+        data_pointer[0] = buffer[255 - i];
+        data_pointer[-1] = buffer[i];
+        data_pointer[2] = 5;
+        data_pointer += 4; // Avança 4 bytes por iteração
+    }
+
+    // 4. Inicializar valores adicionais
+    data_pointer = (uint8_t*)(base_offset + 3);
+    for (i = 0; i < 10; i++) {
+        data_pointer[0x3D8] = 2;
+        data_pointer[0] = 2;
+        data_pointer += 4; // Avança 4 bytes por iteração
+    }
+
+    // 5. Retornar sucesso com um valor específico
+    return 0x01; // Valor simplificado (sem CONCAT31)
+}
+
+
 int __cdecl directDrawFailedInit(HWND windowIdentifier)
 
 {
@@ -89,6 +187,81 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     return 0;
 }
 
+
+/*
+* __ftol() 
+A função __ftol() realiza a conversão de um número de ponto flutuante 
+(armazenado no registrador ST0 da FPU - Unidade de Ponto Flutuante) para
+um inteiro de 64 bits (longlong) usando arredondamento (ROUND).
+
+Isso significa que, para qualquer número em ST0 no momento da chamada,
+ele será arredondado ao inteiro mais próximo e retornado.
+
+Talvez mudar o retorno pra int ou float (mas c/ ressalvas);
+*/
+long long __ftol(void)
+{
+    float in_ST0; // ST0 é um registrador da FPU (Unidade de Ponto flutuante) p/ um inteiro de 64 bits(long long)
+    return (long long)std::round(in_ST0); //  return (long long)ROUND(in_ST0);
+}
+
+
+/*
+* FUN_00473d30
+Analisando a função FUN_00473d30, parece que ela está implementando
+uma espera ativa que dura até 2 segundos ou até um certo limite de iterações,
+com algumas peculiaridades.
+Essa função parece ser um tipo de temporizador baseado em polling, 
+verificando continuamente o tempo até atingir um limite de 2 segundos.
+O valor retornado depende da implementação interna de __ftol().
+*/
+long long FUN_00473d30(void)
+
+{
+    DWORD DVar1;
+    DWORD DVar2;
+    long long lVar3;
+    int local_8;
+
+    DVar1 = timeGetTime();
+    local_8 = 0;
+    do {
+        DVar2 = timeGetTime();
+        if (DVar1 + 2000 <= DVar2) {
+            lVar3 = __ftol();
+            return (int)lVar3;
+        }
+        local_8 = local_8 + 1;
+    } while (local_8 != -1);
+    return 300;
+}
+
+// FUN_00442f30
+void FUN_00442f30(void)
+
+{
+    undefined4 local_20[2];
+    uint uStack_18;
+    uint uStack_14;
+    uint uStack_10;
+
+    local_20[0] = 0x20;
+    (**(code**)(*primarySurface + 0x54))(primarySurface, local_20);
+    DAT_004a55d4 = uStack_18;
+    FUN_00442f00(uStack_18, &DAT_004a55b8);
+    DAT_004a55d0 = uStack_14;
+    FUN_00442f00(uStack_14, &DAT_004a55b4);
+    DAT_004a55cc = uStack_10;
+    FUN_00442f00(uStack_10, &DAT_004a55b0);
+    DAT_004a55c0 = DAT_004a55b8 + -7;
+    DAT_004a51ac = 0xf - DAT_004a55b4;
+    DAT_004a55c8 = 0x17 - DAT_004a55b0;
+    DAT_004a55c4 = 0x17 - DAT_004a55b8;
+    DAT_004a55bc = 7 - DAT_004a55b0;
+    return;
+}
+
+
 //
 //  FUNÇÃO: MainGameWindow()
 //
@@ -106,7 +279,7 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
     unsigned int uVar5;
     int directResult; // int uVar6;
     void* pvVar6;
-    void* puVar7; // undefined4* puVar7; type *void, *int or *unsigned int???
+    void* puVar7; // undefined4* puVar7; type *void, *int or *unsigned int, or a struct
     unsigned long uVar8; // ulong uVar8;
     unsigned long uVar9; // ulong uVar9;
     unsigned long uVar10; // ulong uVar10;
@@ -120,12 +293,12 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
     BYTE* pBVar16;
     WNDCLASS wc = { 0 }; // WINDCLASSA wc
     DWORD aDStack_17c[27];
-    undefined4 uStack_110;
+    int uStack_110; // undefined4 uStack_110;
     BYTE BStack_10c;
-    undefined4 uStack_10b;
+    undefined4 uStack_10b; // é passado seu endereco para o puVar7. Talvez seja do mesmo tipo?
     void* pvStack_c;
-    undefined* puStack_8;
-    undefined4 uStack_4;
+    // undefined* puStack_8; Deixar pra depois pois so eh referenciada em mais um lugar do codigo.
+    int uStack_4; // undefined4 uStack_4; // vou assumir como int pelo contexto do codigo
 
 
     //void* pvStack_c;
@@ -133,10 +306,11 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
 
     // ==============================================
     uStack_4 = -1; //uStack_4 = 0xffffffff;
-    puStack_8 = &LAB_0048a5ec;
+    // puStack_8 = &LAB_0048a5ec; Deixar pra depois pois so eh referenciada em mais um lugar do codigo.
     //pvStack_c = ExceptionList;
     //ExceptionList = &pvStack_c;
-    DAT_004a5a7c = FUN_00473d30();
+    long long DAT_004a5a7c;
+    DAT_004a5a7c = FUN_00473d30(); // DAT_004a5a7c = FUN_00473d30();  DAT_004a5a7c tavez seja uma variavel global long long talvez
     // ==============================================
 
     // Look for active instance of the window (if the window is already open)
@@ -313,18 +487,36 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
                         if (directResult != 0) {
                             directDrawFailedInit(hWnd);
                         }
+                        int _DAT_004a5b88;
+                        int _DAT_004a5b90;
+                        int _DAT_004a5b8c;
+                        int _DAT_004a5b94;
+                        int _DAT_004a5fa0;
+
                         _DAT_004a5b88 = 0;
                         _DAT_004a5b90 = 0x280;
                         _DAT_004a5b8c = 0;
                         _DAT_004a5b94 = 0x1e0;
                         _DAT_004a5fa0 = 0x6c;
-                        ShowCursor(0);
+                        ShowCursor(TRUE); // ShowCursor(0); // Nao mostra o cursor
 
+                        /*
+                        * DAT_0049370c
+                        Quando é igual a 1, um fluxo específico é ativado, o que 
+                        provavelmente afeta como as superfícies gráficas ou paletas 
+                        são configuradas. Observe que, dentro do if, há uma chamada
+                        para FUN_00442a30, que parece carregar um arquivo de paleta 
+                        (s_data\detect.pal_00493158) e configurar algum recurso gráfico
+                        relacionado a cores.
+                        Dado o segundo contexto, provavelmente é um tipo inteiro (e.g., int, uint, ou BYTE):
+                        */
+                        int DAT_0049370c;
                         if (DAT_0049370c == 1) // (DAT_0049370c == '\x01') 
                         {
+                            // TODO VERIFICAR ESSES DADOS MOCKADOS DE DAT_004A5B98
                             uVar5 = FUN_00442a30(
                                 "C:\\Users\\caiom\\OneDrive\\Área de Trabalho\\REDetectiveBarbie2\\REBarbieDetective\\DATA\\detect.pal",
-                                DAT_004a5b98); // uVar5 = FUN_00442a30(s_data\detect.pal_00493158,0x4a5b98);
+                                0x4a5b98); // uVar5 = FUN_00442a30(s_data\detect.pal_00493158,0x4a5b98);
                             if ((char)uVar5 == '\0') // se o caractere for nulo
                             {
                                 // ExceptionList = pvStack_c;
@@ -334,7 +526,9 @@ int MainGameWindow(HINSTANCE param_1, int nCmdShow, int param_2)
 
                             // VTABLE 5
                             // linha: directResult = (**(code**)(*DAT_004a6030 + 0x14))(DAT_004a6030, 0x44, &DAT_004a5b98, &DAT_004a600c, 0);
-                            //
+                            // TODO: Voltar aqui pois o DAT_004a5b98 NAO  parece certo.
+                            //DAT_004a5b98: provavelmente faz parte de uma estrutura de bytes;  00431658 8a 41 ff        MOV        AL,byte ptr [ECX + -0x1]=>DAT_004a5b98
+
                             directResult = DAT_004a6030->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256, DAT_004a5b98, &DAT_004a600c, NULL);
                             if (directResult != 0) {
                                 directDrawFailedInit(hWnd);
