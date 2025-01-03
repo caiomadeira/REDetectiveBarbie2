@@ -1,0 +1,5 @@
+﻿  ReconstructScratch.cpp
+C:\Users\caiom\OneDrive\Área de Trabalho\REDetectiveBarbie2\ReconstructScratch\ReconstructScratch\ReconstructScratch.cpp(67,8): warning C4101: 'hdc': variável local não referenciada
+C:\Users\caiom\OneDrive\Área de Trabalho\REDetectiveBarbie2\ReconstructScratch\ReconstructScratch\ReconstructScratch.cpp(95,24): warning C4101: 'uStack_110': variável local não referenciada
+C:\Users\caiom\OneDrive\Área de Trabalho\REDetectiveBarbie2\ReconstructScratch\ReconstructScratch\ReconstructScratch.cpp(94,26): warning C4101: 'directBufferParameters': variável local não referenciada
+  ReconstructScratch.vcxproj -> C:\Users\caiom\OneDrive\Área de Trabalho\REDetectiveBarbie2\ReconstructScratch\x64\Debug\ReconstructScratch.exe
