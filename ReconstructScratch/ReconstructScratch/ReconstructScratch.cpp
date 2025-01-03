@@ -17,8 +17,8 @@ LPDIRECTDRAW lplpDD; // Direct Draw Var
 LPDIRECTDRAWSURFACE g_pPrimarySurface = nullptr; // Superfície primária
 LPDIRECTDRAWSURFACE g_pSecondarySurface = nullptr; // Superfície secundária (backbuffer)
 
-DWORD screenWidth = 0x500;   // Largura (1280)
-DWORD screenHeight = 0x2d0;  // Altura (720)
+DWORD screenWidth = 0x280;   // Largura (1280)
+DWORD screenHeight = 0x1e0;  // Altura (720)
 DWORD someFlag = 0x6c;       // Valor desconhecido
 DWORD globalState = 1;       // DAT_0049370c
 
@@ -27,6 +27,21 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL MainGameWindow(HINSTANCE hInstance, int nCmdShow, int param_3);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+
+void debugError(HRESULT result, const wchar_t* txt)
+{
+    wchar_t errorMsg[256];
+    swprintf(errorMsg, sizeof(errorMsg) / sizeof(errorMsg[0]), txt, result);
+    MessageBox(hWnd, errorMsg, L"Erro", MB_OK);
+}
+
+// FUN_00473ce0
+BOOL directError(HWND hwnd, LPCWSTR txt)
+{
+    MessageBox(hwnd, txt, L"Detective Barbie 2: Error", MB_OK | MB_ICONERROR);
+    DestroyWindow(hwnd);
+    return 0;
+}
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine,  _In_ int nCmdShow)
 {
@@ -93,7 +108,7 @@ BOOL MainGameWindow(HINSTANCE hInstance, int nCmdShow, int param_3)
                {
                    DWORD directBufferParameters[27]; // DWORD aDStack_17c[27];
                    int uStack_110;                  
-                   DWORD DAT_0049370c = 32; // EXEMPLO DE VALOR
+                   DWORD DAT_0049370c = 8; // EXEMPLO DE VALOR
 
                    // surface
                    DDSURFACEDESC surfaceDesc = {};
@@ -118,79 +133,81 @@ BOOL MainGameWindow(HINSTANCE hInstance, int nCmdShow, int param_3)
                        // 5. Criar a superfície secundária (backbuffer)
                        ddsd.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT;
                        ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-                       ddsd.dwWidth = 1280; // Largura
-                       ddsd.dwHeight = 720; // Altura
+                       ddsd.dwWidth = 640; // Largura
+                       ddsd.dwHeight = 480; // Altura
 
                        result = lplpDD->CreateSurface(&ddsd, &g_pSecondarySurface, nullptr);
                        if (FAILED(result)) {
                            MessageBox(hWnd, L"Falha ao criar a superfície secundária.", L"Erro", MB_OK);
                        }
-                   }
-
-                   // Continuando
-
-                       // Caso exista um erro, chamar FUN_00473ce0
-                   auto handleError = [&](HWND hWnd) {
-                        // FUN_00473ce0(hWnd);
-                        return DDERR_GENERIC;
-                    };
-
-                   // Atualizar algumas variáveis globais
-                   DWORD _DAT_004a5b90 = screenWidth;
-                   DWORD _DAT_004a5b8c = 0;
-                   DWORD _DAT_004a5b94 = screenHeight;
-                   DWORD _DAT_004a5fa0 = someFlag;
-
-                   // Mostrar cursor
-                   ShowCursor(TRUE);
-
-
-                   int globalState = 1; // globalState
-                   if (globalState == 1)
-                   {
-                       // Detecta a paleta de cores
-                       // auto feedback2 = FUN_00442a30("DATA\\detect.pal", 0x4a5b98); // 0x4a5b98 deve ser um endereco
-                       auto feedback2 = 1;
-                       if (feedback2 == 0)
+                       else
                        {
-                           MessageBox(hWnd, L"Erro ao carregar detect.pal", L"feedback2 == 0", MB_OK);
-                           return FALSE;
-                       }
-                       // Configurar a paleta com DirectDraw
-                       LPDIRECTDRAWPALETTE pPalette = nullptr;
-                       PALETTEENTRY paletteData[256]; // Array com 256 entradas (tamanho da paleta de 8 bits)
-                       for (int i = 0; i < 256; ++i) {
-                           paletteData[i].peRed = i;       // Exemplo: Gradiente de vermelho
-                           paletteData[i].peGreen = 0;     // Sem verde
-                           paletteData[i].peBlue = 255 - i; // Gradiente inverso de azul
-                           paletteData[i].peFlags = 0;     // Sem flags adicionais
-                       }
+                           // Continuando
 
-                       result = lplpDD->CreatePalette(DDPCAPS_8BIT | DDPCAPS_INITIALIZE, paletteData, &pPalette, nullptr);
-                       if (FAILED(result)) {
-                           //FUN_00473ce0(hWnd); // Handle error
-                           MessageBox(hWnd, L"Create Pallete.", L"FUN_00473ce0", MB_OK);
-                       }
+    // Caso exista um erro, chamar FUN_00473ce0
+                           auto handleError = [&](HWND hWnd) {
+                               directError(hWnd, L"Generic Error"); // FUN_00473ce0(hWnd);
+                               return DDERR_GENERIC;
+                               };
 
-                       // Aplicar a paleta às superfícies (surfaceA e surfaceB)
-                       result = g_pPrimarySurface->SetPalette(pPalette);
-                       if (FAILED(result)) {
-                           //FUN_00473ce0(hWnd); // Handle error
-                           MessageBox(hWnd, L"Set Pallete primary.", L"FUN_00473ce0", MB_OK);
-                       }
+                           // Atualizar algumas variáveis globais
+                           DWORD _DAT_004a5b90 = screenWidth;
+                           DWORD _DAT_004a5b8c = 0;
+                           DWORD _DAT_004a5b94 = screenHeight;
+                           DWORD _DAT_004a5fa0 = someFlag;
 
-                       result = g_pSecondarySurface->SetPalette(pPalette);
-                       if (FAILED(result)) {
-                           //FUN_00473ce0(hWnd); // Handle error
-                           MessageBox(hWnd, L"Set Pallete secondary.", L"FUN_00473ce0", MB_OK);
-                       }
-                   }
-                   else
-                   {
-                       //FUN_00442f30();
-                       MessageBox(hWnd, L"FUN_00442f30()", L"FUN_00442f30()", MB_OK);
+                           // Mostrar cursor
+                           ShowCursor(TRUE);
 
-                       return FALSE;
+
+                           int globalState = 1; // globalState
+                           if (globalState == 1)
+                           {
+                               // Detecta a paleta de cores
+                               // auto feedback2 = FUN_00442a30("DATA\\detect.pal", 0x4a5b98); // 0x4a5b98 deve ser um endereco
+                               auto feedback2 = 1;
+                               if (feedback2 == 0)
+                               {
+                                   MessageBox(hWnd, L"Erro ao carregar detect.pal", L"feedback2 == 0", MB_OK);
+                                   return FALSE;
+                               }
+                               // Configurar a paleta com DirectDraw
+                               PALETTEENTRY paletteData[256]; // Array com 256 entradas (tamanho da paleta de 8 bits)
+                               for (int i = 0; i < 256; ++i) {
+                                   paletteData[i].peRed = i;       // Exemplo: Gradiente de vermelho
+                                   paletteData[i].peGreen = 0;     // Sem verde
+                                   paletteData[i].peBlue = 255 - i; // Gradiente inverso de azul
+                                   paletteData[i].peFlags = 0;     // Sem flags adicionais
+                               }
+                               LPDIRECTDRAWPALETTE pPalette = nullptr;
+
+                               result = lplpDD->CreatePalette(DDPCAPS_8BIT | DDPCAPS_INITIALIZE, paletteData, &pPalette, nullptr);
+                               if (FAILED(result)) {
+                                   //return directError(hWnd, L"Create Pallete.");  //FUN_00473ce0(hWnd); // Handle error
+                                   debugError(result, L"Erro em CreatetPalette: 0x%08X");
+                               }
+
+                               // Aplicar a paleta às superfícies (surfaceA e surfaceB)
+                               result = g_pPrimarySurface->SetPalette(pPalette);
+                               if (FAILED(result)) {
+                                   // return directError(hWnd, L"Set Pallete primary."); //FUN_00473ce0(hWnd); // Handle error
+                                   debugError(result, L"Erro em SetPalette: 0x%08X");
+                               }
+
+                               result = g_pSecondarySurface->SetPalette(pPalette);
+                               if (FAILED(result)) {
+                                   // return directError(hWnd, L"Set Pallete secondary."); //FUN_00473ce0(hWnd); // Handle error 
+                                   debugError(result, L"Erro em SettPalette2: 0x%08X");
+                               }
+                           }
+                           else
+                           {
+                               //FUN_00442f30();
+                               MessageBox(hWnd, L"_Another_instance_is_already_active", L"FUN_00442f30() (instanceError)", MB_OK);
+
+                               return FALSE;
+                           }
+                       }
                    }
                }
            }
