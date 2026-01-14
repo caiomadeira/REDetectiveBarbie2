@@ -2,7 +2,6 @@
 
 ![cover](assets/cover.jpg).
 
-
 RE on Barbie Detective Barbie(R) II (1998).
 Some patches made by me can found on release tab.
 
