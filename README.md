@@ -5,8 +5,12 @@
 RE on Barbie Detective Barbie(R) II (1998).
 Some patches made by me can found on release tab.
 
-# Patches Updates
+# Hooks/Wrappers
+## ddraw.dll hook (window mode v1)
+![alt text](assets/hookv1.png)
+Add two resultions supports with pre game menu.
 
+# Patches Updates
 ## Patch: d2_v4.exe:
 ![meme](assets/meme.png).
 

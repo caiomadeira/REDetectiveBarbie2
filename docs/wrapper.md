@@ -15,8 +15,6 @@ We said to game to resize window, but not the rendered image. So if we drag over
 This is a **Blt** problem (Bit Block Transfer) and the missing Clipper.
 
 
-
-
 ### About Windows API
 
 SetWindowsPos (https://learn.microsoft.com/pt-br/windows/win32/api/winuser/nf-winuser-setwindowpos)
