@@ -1,3 +1,4 @@
 ﻿cl : linha de comando  warning D9025: substituindo '/sdl' com '/GS-'
   main.cpp
+     Criando biblioteca C:\Users\caiom\OneDrive\Desktop\REDetectiveBarbie2\src\ddraw\Debug\ddraw.lib e objeto C:\Users\caiom\OneDrive\Desktop\REDetectiveBarbie2\src\ddraw\Debug\ddraw.exp
   ddraw.vcxproj -> C:\Users\caiom\OneDrive\Desktop\REDetectiveBarbie2\src\ddraw\Debug\ddraw.dll
