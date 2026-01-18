@@ -5,15 +5,15 @@
 RE on Barbie Detective Barbie(R) II (1998).
 Some patches made by me can found on release tab.
 
-# Hooks/Wrappers
+# Changelog
+
+### V4.2 - Hooks/Wrappers
 ## ddraw.dll hook (window mode v1)
 ![alt text](assets/hookv1.png)
-Add two resultions supports with pre game menu.
+- Add two resultions supports with pre game menu.
 
-# Patches Updates
-## Patch: d2_v4.exe:
+### V4.0 - Patch: d2_v4.exe:
 ![meme](assets/meme.png).
-
 - Finally, fix the maze garden crash. You can see details on my [blog post](https://caiomadeira.github.io/posts/02-patch-barbie/).
 
 
