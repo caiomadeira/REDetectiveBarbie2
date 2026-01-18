@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#define DirectDrawCreate DirectDrawCreate_Original
+#include <ddraw.h>
+#undef DirectDrawCreate
+#pragma comment(lib, "ddraw.lib")
+
 typedef HRESULT(WINAPI* DirectDrawCreate_t)(GUID*, void**, void*);
 typedef HRESULT(WINAPI* SetCooperativeLevel_t)(void*, HWND, DWORD);
 typedef HRESULT(WINAPI* SetDisplayMode_t)(void*, DWORD, DWORD, DWORD);
@@ -15,9 +20,12 @@ HMODULE hSystemDDraw = NULL;
 
 int hwnd_selectedMode = 0;
 HMODULE g_hModule = NULL;
+HWND hGameWnd = NULL;
 
 #define ID_COMBOBOX 101
 #define ID_BUTTON 102
+
+void hookSurface(void* lpSurface);
 
 void GetDesktopResolution(int* horizontal, int* vertical) {
     *horizontal = GetSystemMetrics(SM_CXSCREEN);
@@ -32,8 +40,9 @@ LRESULT CALLBACK launcherWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
     GetDesktopResolution(&h, &v);
     switch (msg) {
     case WM_CREATE:
+    {
         hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-        CreateWindowA("STATIC", "Select the game mode", WS_VISIBLE | WS_CHILD, 
+        CreateWindowA("STATIC", "Select resolution.", WS_VISIBLE | WS_CHILD, 
         20, 20, 200, 20, hWnd, NULL, g_hModule, NULL);
 
         hComboBox = CreateWindowA("COMBOBOX", NULL,
@@ -41,31 +50,42 @@ LRESULT CALLBACK launcherWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
             20, 50, 240, 200, hWnd, (HMENU)ID_COMBOBOX, g_hModule, NULL);
 
             SendMessageA(hComboBox, WM_SETFONT, (WPARAM)hFont, TRUE);
+            HANDLE hIcon = LoadImageA(NULL, "BD32.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE | LR_SHARED);
+            if (hIcon) {
+                SendMessageA(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+                SendMessageA(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+            }
             // SendMessageA(hComboBox, CB_ADDSTRING, 0, (LPARAM)"Window Mode (Recommended)");
             // SendMessageA(hComboBox, CB_ADDSTRING, 0, (LPARAM)"Fullscreen (Can freeze)");
-            SendMessageA(hComboBox, CB_ADDSTRING, 0, (LPARAM)"640x480 (Original)");
-            SendMessageA(hComboBox, CB_ADDSTRING, 0, (LPARAM)"1280X720");
+            SendMessageA(hComboBox, CB_ADDSTRING, 0, (LPARAM)"640x480 (Original/Windowned)");
             char szDesktopRes[64];
-            snprintf(szDesktopRes, sizeof(szDesktopRes), "%dx%d (Your resolution)", h, v);
+            snprintf(szDesktopRes, sizeof(szDesktopRes), "%dx%d (FullScreen)", h, v);
             SendMessageA(hComboBox, CB_ADDSTRING, 0, (LPARAM)szDesktopRes);
             SendMessageA(hComboBox, CB_SETCURSEL, 0, 0);
-
             hBtn = CreateWindowA("BUTTON", "Play",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
                 80, 100, 120, 30, hWnd, (HMENU)ID_BUTTON, g_hModule, NULL);
             SendMessageA(hBtn, WM_SETFONT, (WPARAM)hFont, TRUE);
+            HWND hCredits = CreateWindowA("STATIC", "by caio madeira: github.com/caiomadeira",
+                WS_VISIBLE | WS_CHILD | SS_CENTER, 
+                10, 140, 260, 20, 
+                hWnd, NULL, g_hModule, NULL);
+            SendMessageA(hCredits, WM_SETFONT, (WPARAM)hFont, TRUE);
             break;
-
+    }
     case WM_COMMAND:
+    {
         if (LOWORD(wParam) == ID_BUTTON) {
             hwnd_selectedMode = SendMessageA(hComboBox, CB_GETCURSEL, 0, 0);
             PostQuitMessage(0);
         }
         break;
-
+    }
     case WM_CLOSE:
+    {
         ExitProcess(0);
         break;
+    }
     default:
         return DefWindowProcA(hWnd, msg, wParam, lParam);
     }
@@ -87,7 +107,7 @@ void SelectResultionMode() {
     int x = (scrW - w) / 2;
     int y = (srcH - h) / 2;
 
-    HWND hWnd = CreateWindowA("D2Launcher", "Configuration = Detective Barbie II", 
+    HWND hLauncher = CreateWindowA("D2Launcher", "Resolution Config - Detective Barbie II", 
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
         x, y, w, h, NULL, NULL, g_hModule, NULL);
 
@@ -96,38 +116,61 @@ void SelectResultionMode() {
         TranslateMessage(&msg),
         DispatchMessageA(&msg);
     }
+
+    if (IsWindow(hLauncher)) DestroyWindow(hLauncher);
+}
+
+void CenteringWindow(int targetW, int targetH, LONG style, int screenW, int screenH, int* resultX, int* resultY, int* totalW, int* totalH) {
+    RECT rc = { 0, 0, targetW, targetH };
+    AdjustWindowRect(&rc, style, FALSE);
+
+    *totalW = rc.right - rc.left;
+    *totalH = rc.bottom - rc.top;
+
+    if (hwnd_selectedMode != 0) {
+        *resultX = (screenW - *totalW) / 2;
+        *resultY = (screenH - *totalH) / 2;
+    }
+    else {
+        *resultX = 0;
+        *resultY = 0;
+    }
 }
 
 HRESULT WINAPI fake_SetCooperativeLevel(void* self, HWND hWnd, DWORD dwFlags) {
-    int h = 0;
-    int v = 0;
-    GetDesktopResolution(&h, &v);
-    // 0x00000008 = DDSCL_NORMAL 
     if (hWnd) {
-        LONG estilo = GetWindowLong(hWnd, GWL_STYLE);
-        estilo &= ~WS_POPUP;
-        estilo |= (WS_OVERLAPPEDWINDOW | WS_VISIBLE);
-        SetWindowLong(hWnd, GWL_STYLE, estilo);
         if (hwnd_selectedMode == 0) {
-            SetWindowPos(hWnd, NULL, 0, 0, 640, 480, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
-        }
-        else if (hwnd_selectedMode == 1) {
-            SetWindowPos(hWnd, NULL, 0, 0, 1280, 720, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
-        }
-        else if (hwnd_selectedMode == 2) {
-            SetWindowPos(hWnd, NULL, 0, 0, h, v, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+            LONG style = GetWindowLong(hWnd, GWL_STYLE);
+            style &= ~WS_POPUP;
+            style |= (WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+            SetWindowLong(hWnd, GWL_STYLE, style);
+
+            RECT rc = { 0, 0, 640, 480 };
+            AdjustWindowRect(&rc, style, FALSE);
+            int totalW = rc.right - rc.left;
+            int totalH = rc.bottom - rc.top;
+
+            int scrW = GetSystemMetrics(SM_CXSCREEN);
+            int scrH = GetSystemMetrics(SM_CYSCREEN);
+            //int x = (scrW - totalW) / 2;
+            //int y = (scrH - totalH) / 2;
+            int x = 0;
+            int y = 0;
+            
+            SetWindowPos(hWnd, NULL, x, y, totalW, totalH, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+
+            return r_SetCooperativeLevel(self, hWnd, DDSCL_NORMAL);
         }
         else {
-            SetWindowPos(hWnd, NULL, 0, 0, 640, 480, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+            return r_SetCooperativeLevel(self, hWnd, dwFlags);
         }
     }
-    return r_SetCooperativeLevel(self, hWnd, 0x00000008);
+    return r_SetCooperativeLevel(self, hWnd, dwFlags);
 }
 
 HRESULT WINAPI fake_SetDisplayMode(void* self, DWORD width, DWORD height, DWORD bpp) {
 
-    if (hwnd_selectedMode == 0)
-        return 0;
+    if (hwnd_selectedMode == 0) return 0;
     return r_SetDisplayMode(self, width, height, bpp);
 }
 
@@ -150,7 +193,7 @@ void hookVTable(void* lpDD) {
     VirtualProtect(&vtable[indexDisp], sizeof(void*), protect, &protect);
 }
 
-HRESULT WINAPI DirectDrawCreate(GUID* lpGUID, void** lplpDD, void* pUnkOuter) {
+extern "C" HRESULT WINAPI DirectDrawCreate(GUID* lpGUID, void** lplpDD, void* pUnkOuter) {
     if (!hSystemDDraw) {
     if (g_hModule == NULL) g_hModule = GetModuleHandle(NULL);
         SelectResultionMode();
@@ -160,13 +203,13 @@ HRESULT WINAPI DirectDrawCreate(GUID* lpGUID, void** lplpDD, void* pUnkOuter) {
 
         hSystemDDraw = LoadLibraryA(path);
         if (!hSystemDDraw) {
-            MessageBoxA(NULL, "Erro Fatal: Nao achei ddraw.dll no System32", "Wrapper Error", MB_OK | MB_ICONERROR);
+            MessageBoxA(NULL, "FATAL ERROR: ddraw.dll is not in game folder", "Wrapper Error", MB_OK | MB_ICONERROR);
             return -1;
         }
 
         r_DirectDrawCreate = (DirectDrawCreate_t)GetProcAddress(hSystemDDraw, "DirectDrawCreate");
         if (!r_DirectDrawCreate) {
-            MessageBoxA(NULL, "Erro: DDraw original invalido", "Wrapper Error", MB_OK | MB_ICONERROR);
+            MessageBoxA(NULL, "ERROR: original DDraw invalid.", "Wrapper Error", MB_OK | MB_ICONERROR);
             return -1;
         }
     }
@@ -176,7 +219,7 @@ HRESULT WINAPI DirectDrawCreate(GUID* lpGUID, void** lplpDD, void* pUnkOuter) {
     if (hr == 0 && lplpDD && *lplpDD) {
         hookVTable(*lplpDD);
     }
-
+    ShowCursor(true);
     return hr;
 }
 
