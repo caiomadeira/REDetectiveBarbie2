@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ddraw.vcxproj" Id="3a272826-d656-43f2-b1d7-ebd7eeb5602a" />
+</Solution>

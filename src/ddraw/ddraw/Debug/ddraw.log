@@ -1,0 +1,3 @@
+﻿cl : linha de comando  warning D9025: substituindo '/sdl' com '/GS-'
+  main.cpp
+  ddraw.vcxproj -> C:\Users\caiom\OneDrive\Desktop\REDetectiveBarbie2\src\ddraw\Debug\ddraw.dll

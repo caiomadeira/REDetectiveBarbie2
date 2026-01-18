@@ -1,0 +1,53 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\caiom\\OneDrive\\Desktop\\REDetectiveBarbie2\\src\\ddraw\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{3A272826-D656-43F2-B1D7-EBD7EEB5602A}|ddraw.vcxproj|C:\\Users\\caiom\\OneDrive\\Desktop\\REDetectiveBarbie2\\src\\ddraw\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{3A272826-D656-43F2-B1D7-EBD7EEB5602A}|ddraw.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A272826-D656-43F2-B1D7-EBD7EEB5602A}|ddraw.vcxproj|C:\\Users\\caiom\\OneDrive\\Desktop\\REDetectiveBarbie2\\src\\ddraw\\ddraw.def||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{3A272826-D656-43F2-B1D7-EBD7EEB5602A}|ddraw.vcxproj|solutionrelative:ddraw.def||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 780,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ddraw.def",
+              "DocumentMoniker": "C:\\Users\\caiom\\OneDrive\\Desktop\\REDetectiveBarbie2\\src\\ddraw\\ddraw.def",
+              "RelativeDocumentMoniker": "ddraw.def",
+              "ToolTip": "C:\\Users\\caiom\\OneDrive\\Desktop\\REDetectiveBarbie2\\src\\ddraw\\ddraw.def",
+              "RelativeToolTip": "ddraw.def",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001913|",
+              "WhenOpened": "2026-01-17T01:00:11.285Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\caiom\\OneDrive\\Desktop\\REDetectiveBarbie2\\src\\ddraw\\main.cpp",
+              "RelativeDocumentMoniker": "main.cpp",
+              "ToolTip": "C:\\Users\\caiom\\OneDrive\\Desktop\\REDetectiveBarbie2\\src\\ddraw\\main.cpp",
+              "RelativeToolTip": "main.cpp",
+              "ViewState": "AgIAACgAAAAAAAAAAAAAADoAAABbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-01-17T00:59:44.887Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
